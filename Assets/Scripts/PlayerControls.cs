@@ -7,12 +7,14 @@ using UnityEngine;
 public class PlayerControls : MonoBehaviour
 {
     public Camera playerCamera;
-    public float walkSpeed = 6f;
-    public float runSpeed = 12f;
-    public float jumpPower = 7f;
-    public float gravity = 10f;
-    public float lookSpeed = 2f;
-    public float lookXLimit = 45f;
+    public float walkSpeed = 10f;
+    public float runSpeed = 20f;
+    public float jumpPower = 15f;
+    public float gravity = 9.81f;
+    public float fallMultiplier = 2.5f;
+    public float lowJumpMultiplier = 2f;
+    public float lookSpeed = 2.5f;
+    public float lookXLimit = 55f;
     public float defaultHeight = 2f;
     public float crouchHeight = 1f;
     public float crouchSpeed = 3f;
@@ -52,7 +54,18 @@ public class PlayerControls : MonoBehaviour
 
         if (!characterController.isGrounded)
         {
-            moveDirection.y -= gravity * Time.deltaTime;
+            if (moveDirection.y < 0) // falling
+            {
+                moveDirection.y -= gravity * fallMultiplier * Time.deltaTime;
+            }
+            else if (moveDirection.y > 0 && !Input.GetButton("Jump")) // short jump (released early)
+            {
+                moveDirection.y -= gravity * lowJumpMultiplier * Time.deltaTime;
+            }
+            else // normal upward motion
+            {
+                moveDirection.y -= gravity * Time.deltaTime;
+            }
         }
 
         if (Input.GetKey(KeyCode.R) && canMove)
